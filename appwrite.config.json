@@ -1,0 +1,177 @@
+{
+    "projectId": "691a5f1f0017f6f89f68",
+    "endpoint": "https://nyc.cloud.appwrite.io/v1",
+    "projectName": "recommendmeamovie",
+    "settings": {
+        "services": {
+            "account": true,
+            "avatars": true,
+            "databases": true,
+            "locale": true,
+            "health": true,
+            "storage": true,
+            "teams": true,
+            "users": true,
+            "sites": true,
+            "functions": true,
+            "graphql": true,
+            "messaging": true
+        },
+        "auth": {
+            "methods": {
+                "jwt": true,
+                "phone": true,
+                "invites": true,
+                "anonymous": true,
+                "email-otp": true,
+                "magic-url": true,
+                "email-password": true
+            },
+            "security": {
+                "duration": 31536000,
+                "limit": 0,
+                "sessionsLimit": 10,
+                "passwordHistory": 0,
+                "passwordDictionary": false,
+                "personalDataCheck": false,
+                "sessionAlerts": false,
+                "mockNumbers": []
+            }
+        }
+    },
+    "functions": [
+        {
+            "$id": "691a688d0036e7133936",
+            "execute": [
+                "any"
+            ],
+            "name": "populate-movies",
+            "enabled": true,
+            "logging": true,
+            "runtime": "node-22",
+            "scopes": [
+                "users.read"
+            ],
+            "events": [],
+            "schedule": "",
+            "timeout": 15,
+            "entrypoint": "src/main.js",
+            "commands": "npm install",
+            "specification": "s-0.5vcpu-512mb",
+            "path": "functions/populate-movies"
+        },
+        {
+            "$id": "691a6c9d000df9d02788",
+            "name": "populate-movies",
+            "runtime": "node-22",
+            "specification": "s-0.5vcpu-512mb",
+            "execute": [
+                "any"
+            ],
+            "events": [],
+            "scopes": [
+                "users.read"
+            ],
+            "schedule": "",
+            "timeout": 15,
+            "enabled": true,
+            "logging": true,
+            "entrypoint": "src/main.js",
+            "commands": "npm install",
+            "path": "functions/populate-movies"
+        }
+    ],
+    "tablesDB": [
+        {
+            "$id": "691a6714001919ccb1b7",
+            "name": "movies_db",
+            "enabled": true
+        }
+    ],
+    "tables": [
+        {
+            "$id": "movies",
+            "$permissions": [],
+            "databaseId": "691a6714001919ccb1b7",
+            "name": "movies",
+            "enabled": true,
+            "rowSecurity": false,
+            "columns": [
+                {
+                    "key": "tmdb_id",
+                    "type": "integer",
+                    "required": true,
+                    "array": false,
+                    "min": -9223372036854775808,
+                    "max": 9223372036854775807,
+                    "default": null
+                },
+                {
+                    "key": "title",
+                    "type": "string",
+                    "required": true,
+                    "array": false,
+                    "size": 255,
+                    "default": null,
+                    "encrypt": false
+                },
+                {
+                    "key": "overview",
+                    "type": "string",
+                    "required": false,
+                    "array": false,
+                    "size": 1000,
+                    "default": null,
+                    "encrypt": false
+                },
+                {
+                    "key": "poster_path",
+                    "type": "string",
+                    "required": false,
+                    "array": false,
+                    "size": 255,
+                    "default": null,
+                    "encrypt": false
+                },
+                {
+                    "key": "release_date",
+                    "type": "string",
+                    "required": false,
+                    "array": false,
+                    "size": 50,
+                    "default": null,
+                    "encrypt": false
+                },
+                {
+                    "key": "vote_average",
+                    "type": "boolean",
+                    "required": false,
+                    "array": false,
+                    "default": null
+                },
+                {
+                    "key": "genres",
+                    "type": "string",
+                    "required": false,
+                    "array": false,
+                    "size": 500,
+                    "default": null,
+                    "encrypt": false
+                }
+            ],
+            "indexes": [
+                {
+                    "key": "index_title",
+                    "type": "key",
+                    "status": "available",
+                    "columns": [
+                        "title"
+                    ],
+                    "orders": [
+                        "ASC"
+                    ]
+                }
+            ]
+        }
+    ]
+}

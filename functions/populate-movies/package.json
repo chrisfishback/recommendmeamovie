@@ -1,0 +1,14 @@
+{
+  "name": "populate-movies",
+  "version": "1.0.0",
+  "description": "Populate Appwrite database with movies from TMDB",
+  "main": "src/main.js",
+  "type": "module",
+  "scripts": {
+    "start": "node src/main.js"
+  },
+  "dependencies": {
+    "node-appwrite": "^14.1.0",
+    "node-fetch": "^3.3.2"
+  }
+}
