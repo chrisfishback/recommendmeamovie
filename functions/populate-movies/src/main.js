@@ -9,8 +9,24 @@ export default async ({ req, res, log, error }) => {
   const databases = new Databases(client);
 
   const TMDB_API_KEY = process.env.TMDB_API_KEY;
-  const DATABASE_ID = process.env.APPWRITE_DATABASE_ID;
-  const COLLECTION_ID = process.env.APPWRITE_COLLECTION_ID;
+  const APPWRITE_DATABASE_ID = process.env.APPWRITE_DATABASE_ID;
+  const APPWRITE_COLLECTION_ID = process.env.APPWRITE_COLLECTION_ID;
+
+  // Validate required environment variables early to provide clear errors
+  const required = {
+    TMDB_API_KEY,
+    APPWRITE_DATABASE_ID,
+    APPWRITE_COLLECTION_ID,
+    APPWRITE_FUNCTION_PROJECT_ID: process.env.APPWRITE_FUNCTION_PROJECT_ID,
+    APPWRITE_API_KEY: process.env.APPWRITE_API_KEY
+  };
+
+  const missing = Object.keys(required).filter((k) => !required[k]);
+  if (missing.length > 0) {
+    const msg = `Missing required environment variables: ${missing.join(', ')}`;
+    error(msg);
+    return res.json({ success: false, error: msg }, 500);
+  }
 
   try {
     log('Starting to fetch movies from TMDB...');
@@ -19,9 +35,14 @@ export default async ({ req, res, log, error }) => {
     const response = await fetch(
       `https://api.themoviedb.org/3/movie/popular?api_key=${TMDB_API_KEY}&language=en-US&page=1`
     );
-    
+
+    if (!response.ok) {
+      const body = await response.text();
+      throw new Error(`TMDB fetch failed (${response.status}): ${body}`);
+    }
+
     const data = await response.json();
-    const movies = data.results;
+    const movies = Array.isArray(data.results) ? data.results : [];
 
     log(`Fetched ${movies.length} movies from TMDB`);
 
@@ -33,8 +54,8 @@ export default async ({ req, res, log, error }) => {
       try {
         // Check if movie already exists
         const existing = await databases.listDocuments(
-          DATABASE_ID,
-          COLLECTION_ID,
+          APPWRITE_DATABASE_ID,
+          APPWRITE_COLLECTION_ID,
           [Query.equal('tmdb_id', movie.id)]
         );
 
@@ -53,8 +74,8 @@ export default async ({ req, res, log, error }) => {
 
         // Insert movie
         await databases.createDocument(
-          DATABASE_ID,
-          COLLECTION_ID,
+          APPWRITE_DATABASE_ID,
+          APPWRITE_COLLECTION_ID,
           'unique()', // Auto-generate ID
           {
             tmdb_id: movie.id,
