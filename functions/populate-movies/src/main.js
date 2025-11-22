@@ -1,8 +1,12 @@
 import { Client, Databases, Query } from 'node-appwrite';
 
 export default async ({ req, res, log, error }) => {
+
+  log(`API Key (first 10 chars): ${process.env.APPWRITE_API_KEY?.substring(0, 20)}`);
+  log(`Project ID: ${process.env.APPWRITE_FUNCTION_PROJECT_ID}`);
+  
   const client = new Client()
-    .setEndpoint(process.env.APPWRITE_ENDPOINT || 'https://cloud.appwrite.io/v1')
+    .setEndpoint(process.env.APPWRITE_ENDPOINT || 'https://nyc.cloud.appwrite.io/v1')
     .setProject(process.env.APPWRITE_FUNCTION_PROJECT_ID)
     .setKey(process.env.APPWRITE_API_KEY);
 
@@ -31,7 +35,7 @@ export default async ({ req, res, log, error }) => {
   try {
     log('Starting to fetch movies from TMDB...');
 
-    // Fetch popular movies from TMDB (you can change this to different endpoints)
+    // Fetch popular movies from TMDB
     const response = await fetch(
       `https://api.themoviedb.org/3/movie/popular?api_key=${TMDB_API_KEY}&language=en-US&page=1`
     );
@@ -52,6 +56,7 @@ export default async ({ req, res, log, error }) => {
     // Insert each movie into Appwrite
     for (const movie of movies) {
       try {
+        
         // Check if movie already exists
         const existing = await databases.listDocuments(
           APPWRITE_DATABASE_ID,
@@ -69,6 +74,11 @@ export default async ({ req, res, log, error }) => {
         const genresResponse = await fetch(
           `https://api.themoviedb.org/3/movie/${movie.id}?api_key=${TMDB_API_KEY}`
         );
+        
+        if (!genresResponse.ok) {
+          throw new Error(`Failed to fetch details for movie ${movie.id}`);
+        }
+
         const movieDetails = await genresResponse.json();
         const genreNames = movieDetails.genres.map(g => g.name).join(', ');
 
